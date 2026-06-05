@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>¡Cumple de Alba!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:ital,wght@0,400;0,700;0,800;1,700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --font-display: 'Fredoka', sans-serif;
+    --font-body: 'Nunito', sans-serif;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font-body);
+    background: #0b1026;
+  }
+
+  .app { position: fixed; inset: 0; }
+
+  /* ---------- PÁGINAS ---------- */
+  .page {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6vh 24px 14vh;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.08);
+    transition: opacity .55s ease, transform .55s ease, visibility .55s;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .page.active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+
+  /* contenido por encima de las decoraciones */
+  .content { position: relative; z-index: 5; width: 100%; max-width: 540px; }
+
+  /* entradas escalonadas (se reinician al activar la página) */
+  .reveal {
+    opacity: 0;
+    transform: translateY(34px);
+    transition: opacity .6s cubic-bezier(.2,.9,.3,1.2), transform .6s cubic-bezier(.2,.9,.3,1.2);
+    transition-delay: var(--d, 0s);
+  }
+  .page.active .reveal { opacity: 1; transform: translateY(0); }
+
+  /* ---------- TIPOGRAFÍA ---------- */
+  .kicker {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    font-size: clamp(.7rem, 3vw, .95rem);
+    opacity: .9;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: .95;
+    font-size: clamp(2.6rem, 12vw, 5.2rem);
+    letter-spacing: -.01em;
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1;
+    font-size: clamp(2.2rem, 10vw, 4rem);
+  }
+  .lead {
+    font-weight: 700;
+    font-size: clamp(1rem, 4.6vw, 1.3rem);
+    line-height: 1.45;
+  }
+
+  /* ---------- BOTÓN ---------- */
+  .next {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1rem, 4.6vw, 1.25rem);
+    border: none;
+    cursor: pointer;
+    padding: 17px 30px;
+    border-radius: 999px;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: transform .2s ease, box-shadow .2s ease;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  .next .arrow { transition: transform .25s ease; font-size: 1.2em; }
+  .next:hover { transform: translateY(-3px) scale(1.04); }
+  .next:hover .arrow { transform: translateX(4px); }
+  .next:active { transform: scale(.96); }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 12px 30px rgba(0,0,0,.22), 0 0 0 0 rgba(255,255,255,.4); }
+    50%      { box-shadow: 0 16px 40px rgba(0,0,0,.28), 0 0 0 14px rgba(255,255,255,0); }
+  }
+
+  /* botón atrás */
+  .back {
+    position: absolute;
+    top: 18px; left: 16px;
+    z-index: 30;
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-size: 1.4rem;
+    color: #fff;
+    background: rgba(255,255,255,.18);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: transform .2s, background .2s;
+  }
+  .back:hover { transform: scale(1.1); background: rgba(255,255,255,.3); }
+  .page.active .back { display: flex; }
+  .page--invite .back { display: none !important; }
+
+  /* puntitos de progreso */
+  .dots {
+    position: fixed;
+    bottom: 22px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 40;
+    display: flex;
+    gap: 10px;
+  }
+  .dots button {
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.7);
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    transition: all .3s ease;
+  }
+  .dots button.on { background: #fff; transform: scale(1.35); }
+
+  /* =================================================== */
+  /* PÁGINA 1 — INVITACIÓN                               */
+  /* =================================================== */
+  .page--invite {
+    background:
+      radial-gradient(120% 100% at 80% -10%, #ff9a3c 0%, transparent 45%),
+      radial-gradient(120% 100% at 10% 110%, #c1158f 0%, transparent 50%),
+      linear-gradient(160deg, #ff5fa2 0%, #7b2ff7 60%, #4318a8 100%);
+    color: #fff;
+  }
+  .name-tag {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(3.6rem, 19vw, 8rem);
+    line-height: .9;
+    background: linear-gradient(180deg, #fff 0%, #ffe6a0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 8px 18px rgba(0,0,0,.25));
+    animation: wobble 4s ease-in-out infinite;
+  }
+  @keyframes wobble {
+    0%,100% { transform: rotate(-2deg); }
+    50%     { transform: rotate(2deg); }
+  }
+  .age-badge {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: clamp(110px, 32vw, 150px);
+    height: clamp(110px, 32vw, 150px);
+    border-radius: 50%;
+    background: linear-gradient(145deg, #ffd93d, #ff8a3d);
+    color: #7b2ff7;
+    box-shadow: 0 14px 34px rgba(0,0,0,.3), inset 0 -6px 12px rgba(0,0,0,.12);
+    margin: 10px auto 4px;
+    animation: floatY 3.4s ease-in-out infinite;
+  }
+  .age-badge .num { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.8rem, 13vw, 4rem); line-height: 1; }
+  .age-badge .lbl { font-family: var(--font-display); font-weight: 600; font-size: .8rem; letter-spacing: .15em; text-transform: uppercase; }
+  @keyframes floatY { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+  /* globos */
+  .balloon {
+    position: absolute;
+    bottom: -160px;
+    width: 64px; height: 80px;
+    border-radius: 50% 50% 48% 48%;
+    z-index: 2;
+    animation: rise linear infinite;
+    opacity: .92;
+  }
+  .balloon::after {
+    content: '';
+    position: absolute;
+    bottom: -42px; left: 50%;
+    width: 1px; height: 44px;
+    background: rgba(255,255,255,.5);
+    transform: translateX(-50%);
+  }
+  .balloon::before {
+    content: '';
+    position: absolute;
+    top: 14px; left: 16px;
+    width: 16px; height: 22px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.45);
+    transform: rotate(-20deg);
+  }
+  @keyframes rise {
+    0%   { transform: translateY(0) translateX(0); }
+    50%  { transform: translateY(-55vh) translateX(20px); }
+    100% { transform: translateY(-115vh) translateX(-10px); }
+  }
+
+  /* estrellas titilando */
+  .twinkle { position: absolute; z-index: 1; color: #fff; animation: tw 2.6s ease-in-out infinite; }
+  @keyframes tw { 0%,100% { opacity: .2; transform: scale(.7); } 50% { opacity: 1; transform: scale(1.1); } }
+
+  /* =================================================== */
+  /* PÁGINA 2 — PISCINA                                  */
+  /* =================================================== */
+  .page--pool {
+    background:
+      radial-gradient(110% 80% at 78% 8%, #fff3b0 0%, transparent 36%),
+      linear-gradient(180deg, #8fe3ff 0%, #2bb7e6 45%, #0a86c4 100%);
+    color: #064c63;
+  }
+  .page--pool h2 { color: #fff; text-shadow: 0 4px 12px rgba(4,76,99,.35); }
+  .page--pool .lead { color: #053b4d; }
+
+  /* sol */
+  .sun {
+    position: absolute;
+    top: 7%; right: 12%;
+    width: clamp(70px, 18vw, 110px);
+    height: clamp(70px, 18vw, 110px);
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #fff6c2, #ffd23d);
+    box-shadow: 0 0 50px rgba(255,210,61,.85);
+    z-index: 1;
+  }
+  .sun::before {
+    content: '';
+    position: absolute;
+    inset: -26px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(255,210,61,.0), rgba(255,210,61,.55), rgba(255,210,61,0) 25%, rgba(255,210,61,.55) 50%, rgba(255,210,61,0) 75%, rgba(255,210,61,.55));
+    -webkit-mask: radial-gradient(circle, transparent 56%, #000 57%);
+    mask: radial-gradient(circle, transparent 56%, #000 57%);
+    animation: spin 14s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* flotador dónut */
+  .donut {
+    position: absolute;
+    top: 16%; left: 8%;
+    width: clamp(60px, 16vw, 92px);
+    height: clamp(60px, 16vw, 92px);
+    border-radius: 50%;
+    border: clamp(16px, 4.5vw, 26px) solid #ff6f91;
+    box-shadow: inset 0 0 0 4px rgba(255,255,255,.6);
+    z-index: 1;
+    animation: floatY 4s ease-in-out infinite, spin 22s linear infinite;
+    opacity: .9;
+  }
+
+  /* burbujas */
+  .bubble {
+    position: absolute;
+    bottom: -40px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.18));
+    border: 1px solid rgba(255,255,255,.5);
+    z-index: 2;
+    animation: bubbleUp linear infinite;
+  }
+  @keyframes bubbleUp {
+    0%   { transform: translateY(0) translateX(0); opacity: 0; }
+    10%  { opacity: .9; }
+    90%  { opacity: .9; }
+    100% { transform: translateY(-105vh) translateX(30px); opacity: 0; }
+  }
+
+  /* olas */
+  .waves { position: absolute; bottom: 0; left: 0; width: 100%; height: 26vh; z-index: 3; }
+  .waves svg { width: 200%; height: 100%; display: block; }
+  .wave1 { animation: waveMove 9s linear infinite; opacity: .55; }
+  .wave2 { animation: waveMove 6s linear infinite reverse; opacity: .8; }
+  @keyframes waveMove { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* =================================================== */
+  /* PÁGINA 3 — SLIME                                    */
+  /* =================================================== */
+  .page--slime {
+    background:
+      radial-gradient(100% 80% at 20% 10%, #2b0b4f 0%, transparent 40%),
+      linear-gradient(160deg, #1a0633 0%, #2d0a55 55%, #120526 100%);
+    color: #fff;
+  }
+  .page--slime h2 {
+    background: linear-gradient(90deg, #aaff00, #00ffc8, #ff2db5);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 22px rgba(170,255,0,.35));
+  }
+  .slime-stage {
+    position: relative;
+    width: clamp(220px, 70vw, 320px);
+    height: clamp(220px, 70vw, 320px);
+    margin: 6px auto 4px;
+    filter: url(#goo);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--slime, #6be400);
+    transition: background .5s ease;
+  }
+  .blob.b0 { width: 56%; height: 56%; top: 22%; left: 22%; animation: morph 6s ease-in-out infinite; }
+  .blob.b1 { width: 34%; height: 34%; top: 6%;  left: 30%; animation: orbit1 5s ease-in-out infinite; }
+  .blob.b2 { width: 30%; height: 30%; top: 48%; left: 6%;  animation: orbit2 6.5s ease-in-out infinite; }
+  .blob.b3 { width: 32%; height: 32%; top: 50%; left: 60%; animation: orbit3 5.6s ease-in-out infinite; }
+  .blob.b4 { width: 24%; height: 24%; top: 16%; left: 56%; animation: orbit1 7s ease-in-out infinite reverse; }
+  @keyframes morph {
+    0%,100% { border-radius: 50% 50% 50% 50%; transform: scale(1); }
+    33%     { border-radius: 60% 40% 55% 45%; transform: scale(1.05); }
+    66%     { border-radius: 42% 58% 45% 55%; transform: scale(.97); }
+  }
+  @keyframes orbit1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(18px, 26px); } }
+  @keyframes orbit2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(34px, -16px); } }
+  @keyframes orbit3 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-30px, -22px); } }
+
+  /* ojitos del slime para darle vida */
+  .slime-face { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
+  .eye {
+    position: absolute;
+    top: 42%;
+    width: 30px; height: 30px;
+    background: #14081f;
+    border-radius: 50%;
+    animation: blink 4s infinite;
+  }
+  .eye::after { content:''; position:absolute; top:5px; right:6px; width:9px; height:9px; background:#fff; border-radius:50%; }
+  .eye.l { left: 36%; }
+  .eye.r { left: 52%; }
+  @keyframes blink { 0%,92%,100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+
+  .tap-hint {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: #6be400;
+    font-size: 1rem;
+    margin-top: 2px;
+    animation: bob 1.6s ease-in-out infinite;
+  }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+  /* gotas que saltan al tocar */
+  .drop {
+    position: absolute;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--slime, #6be400);
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  /* =================================================== */
+  /* PÁGINA 4 — PIZZA                                    */
+  /* =================================================== */
+  .page--pizza {
+    background:
+      radial-gradient(110% 90% at 50% -10%, #ffd56b 0%, transparent 42%),
+      linear-gradient(165deg, #ff7a3c 0%, #e23744 60%, #9e1c2f 100%);
+    color: #fff;
+  }
+  .page--pizza h2 { text-shadow: 0 4px 14px rgba(0,0,0,.25); }
+  .pizza-wrap { position: relative; width: clamp(200px, 62vw, 290px); height: clamp(200px, 62vw, 290px); margin: 8px auto; }
+  .pizza {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 50% 50%, #ffd98a 0%, #f4b94e 62%, #c8862b 64%, #e0a83e 70%, #b9742a 100%);
+    box-shadow: 0 18px 40px rgba(0,0,0,.35), inset 0 0 0 10px rgba(255,255,255,.06);
+    animation: spinSlow 18s linear infinite;
+  }
+  .pizza .sauce {
+    position: absolute; inset: 11%;
+    border-radius: 50%;
+    background: radial-gradient(circle, #e7472f 0%, #c8341f 70%, #b22d1b 100%);
+  }
+  .topping { position: absolute; border-radius: 50%; }
+  .pep { width: 13%; height: 13%; background: radial-gradient(circle at 40% 35%, #e85d4a, #b8261a); box-shadow: inset 0 0 0 2px rgba(0,0,0,.12); }
+  .basil { width: 8%; height: 11%; background: #3f9b3f; border-radius: 60% 0 60% 0; transform: rotate(20deg); }
+  .chz { width: 6%; height: 6%; background: #fff2c2; border-radius: 40%; opacity:.85; }
+
+  @keyframes spinSlow { to { transform: rotate(360deg); } }
+
+  /* vapor */
+  .steam {
+    position: absolute;
+    bottom: 78%; 
+    width: 10px; height: 50px;
+    background: linear-gradient(to top, rgba(255,255,255,.6), rgba(255,255,255,0));
+    border-radius: 50%;
+    filter: blur(3px);
+    z-index: 1;
+    animation: steam 3s ease-in-out infinite;
+    opacity: 0;
+  }
+  @keyframes steam {
+    0%   { transform: translateY(10px) scaleX(1); opacity: 0; }
+    30%  { opacity: .7; }
+    100% { transform: translateY(-60px) scaleX(1.5); opacity: 0; }
+  }
+
+  /* =================================================== */
+  /* PÁGINA 5 — GRACIAS                                  */
+  /* =================================================== */
+  .page--thanks {
+    background:
+      radial-gradient(120% 90% at 50% 0%, #ffb3d9 0%, transparent 45%),
+      linear-gradient(160deg, #7b2ff7 0%, #ff5fa2 55%, #ff9a3c 100%);
+    color: #fff;
+  }
+  .thanks-big {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.8rem, 16vw, 6rem);
+    line-height: .92;
+    background: linear-gradient(180deg, #fff, #ffe6a0);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 8px 18px rgba(0,0,0,.25));
+  }
+  .card {
+    margin: 22px auto 0;
+    max-width: 380px;
+    background: rgba(255,255,255,.16);
+    border: 1px solid rgba(255,255,255,.35);
+    backdrop-filter: blur(10px);
+    border-radius: 22px;
+    padding: 20px 22px;
+    text-align: left;
+  }
+  .card .row { display: flex; align-items: center; gap: 12px; padding: 8px 0; font-weight: 700; }
+  .card .row + .row { border-top: 1px solid rgba(255,255,255,.22); }
+  .card .ic { font-size: 1.4rem; width: 30px; text-align: center; }
+  .card .row span.val { opacity: .92; }
+  .heart {
+    position: absolute;
+    bottom: -40px;
+    z-index: 2;
+    animation: rise linear infinite;
+  }
+
+  /* confeti (páginas 1 y 5) */
+  .confetti { position: absolute; top: -20px; width: 10px; height: 16px; z-index: 1; will-change: transform; animation: fall linear infinite; }
+  @keyframes fall {
+    0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: .9; }
+  }
+
+  .spacer { height: 22px; }
+
+  /* --- ilustraciones extra de piscina --- */
+  .pool-item { position: absolute; z-index: 2; }
+  .umbrella { bottom: 23vh; left: 5%; width: clamp(72px,18vw,112px); animation: floatY 5s ease-in-out infinite; }
+  .beachball { top: 28%; right: 6%; width: clamp(46px,12vw,72px); z-index: 3; animation: ballBounce 2.6s ease-in-out infinite; }
+  @keyframes ballBounce { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-26px) rotate(160deg); } }
+  .lifering { bottom: 31vh; right: 9%; width: clamp(54px,14vw,84px); animation: floatY 4.4s ease-in-out infinite, spin 16s linear infinite; }
+
+  /* delfín saltando sobre el agua */
+  .dolphin { position: absolute; bottom: 16vh; left: 50%; width: clamp(95px,27vw,155px); margin-left: -13vw; z-index: 4; animation: jump 4.4s ease-in-out infinite; }
+  @keyframes jump {
+    0%   { transform: translateX(-185%) translateY(70px) rotate(-28deg); opacity: 0; }
+    12%  { opacity: 1; }
+    50%  { transform: translateX(0) translateY(-70px) rotate(0deg); opacity: 1; }
+    88%  { opacity: 1; }
+    100% { transform: translateX(185%) translateY(70px) rotate(28deg); opacity: 0; }
+  }
+
+  /* guirnalda de bañadores colgando */
+  .clothesline { position: absolute; top: 0; left: 0; width: 100%; z-index: 2; pointer-events: none; }
+  .clothesline .rope { position: absolute; top: 9%; left: -2%; width: 104%; height: 2px; background: rgba(255,255,255,.55); transform: rotate(-2deg); }
+  .swimwear { position: absolute; top: 9%; width: clamp(34px,9vw,50px); transform-origin: top center; animation: sway 3s ease-in-out infinite; }
+  @keyframes sway { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+
+  /* niño comiendo (pizza) */
+  .pizza-row { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: nowrap; }
+  .pizza-row .pizza-wrap { width: clamp(140px,40vw,200px); height: clamp(140px,40vw,200px); margin: 0; }
+  .kid { width: clamp(110px,33vw,160px); display: block; flex-shrink: 0; }
+  .kid-mouth { animation: chew .55s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes chew { 0%,100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
+  .kid-arm { animation: bite 1.9s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes bite { 0%,100% { transform: translate(12px,14px) rotate(7deg); } 50% { transform: translate(-30px,-4px) rotate(-5deg); } }
+  .nam { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.5rem,7vw,2.3rem); color: #fff; text-shadow: 0 3px 10px rgba(0,0,0,.3); display: inline-block; animation: namPop 1.3s ease-in-out infinite; }
+  @keyframes namPop { 0%,100% { transform: scale(1) rotate(-2deg); } 50% { transform: scale(1.12) rotate(2deg); } }
+
+  /* pregunta que late en la portada */
+  .hero-q {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.7rem, 8.5vw, 3rem);
+    line-height: 1.12;
+    background: linear-gradient(180deg, #fff 0%, #ffe6a0 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 5px 14px rgba(0,0,0,.28));
+    animation: heartbeat 1.5s ease-in-out infinite;
+  }
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.16); }
+  }
+
+  /* texto que crece y decrece (página final) */
+  .pulse-text { display: inline-block; transform-origin: center; animation: breathe 1.8s ease-in-out infinite; }
+  @keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+  /* criaturas marinas (pulpos, calamares, peces) */
+  .sea { animation: bobTilt 5s ease-in-out infinite; }
+  @keyframes bobTilt { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-14px) rotate(4deg); } }
+  .tentacles { transform-box: fill-box; transform-origin: top center; animation: wiggle 2.4s ease-in-out infinite; }
+  @keyframes wiggle { 0%,100% { transform: scaleX(1) skewX(0deg); } 50% { transform: scaleX(1.05) skewX(3deg); } }
+  .fish-swim { position: absolute; left: 0; z-index: 3; animation-timing-function: linear; animation-iteration-count: infinite; will-change: transform; }
+  .fish.flip { transform: scaleX(-1); }
+  @keyframes swimL { from { transform: translateX(102vw); } to { transform: translateX(-28vw); } }
+  @keyframes swimR { from { transform: translateX(-28vw); } to { transform: translateX(102vw); } }
+
+  /* tiburón que se come un pez */
+  .shark-scene { position: absolute; top: 34%; left: 0; width: clamp(120px,32vw,185px); z-index: 4; animation: sharkCross 14s linear infinite; }
+  .shark { width: 100%; display: block; }
+  .shark .jaw { transform-box: fill-box; transform-origin: left center; animation: chomp 14s linear infinite; }
+  @keyframes chomp { 0%,64%,100% { transform: rotate(0deg); } 68% { transform: rotate(15deg); } 73% { transform: rotate(0deg); } }
+  .prey { position: absolute; top: 40%; left: 92%; width: clamp(28px,8vw,44px); animation: preyEaten 14s linear infinite; }
+  @keyframes preyEaten {
+    0%,60%   { transform: translateX(6px) scale(1); opacity: 1; }
+    70%      { transform: translateX(-8px) scale(1); opacity: 1; }
+    74%      { transform: translateX(-20px) scale(.12); opacity: 0; }
+    75%,100% { transform: translateX(6px) scale(.12); opacity: 0; }
+  }
+  @keyframes sharkCross { 0% { transform: translateX(-48vw); } 100% { transform: translateX(118vw); } }
+
+  /* bocadillo del slime */
+  .speech { position: relative; display: inline-block; max-width: 290px; margin: 0 auto; background: #fff; color: #2d0a55; font-family: var(--font-display); font-weight: 600; font-size: clamp(.95rem,4.4vw,1.15rem); padding: 12px 18px; border-radius: 18px; box-shadow: 0 8px 22px rgba(0,0,0,.28); animation: bob 2s ease-in-out infinite; }
+  .speech::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); border: 11px solid transparent; border-top-color: #fff; border-bottom: 0; }
+
+  /* ===== PÁGINA 5 — JUEGO COMECOCOS ===== */
+  .page--game {
+    background:
+      radial-gradient(100% 70% at 50% 0%, #2a1a6e 0%, transparent 50%),
+      linear-gradient(165deg, #120a33 0%, #1b1147 55%, #0c0822 100%);
+    color: #fff;
+    justify-content: flex-start;
+    overflow-y: auto;
+    padding-top: 6vh;
+    padding-bottom: 12vh;
+  }
+  .game-hud { display: flex; gap: 18px; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: clamp(1rem,4.6vw,1.25rem); margin: 6px 0 10px; }
+  .game-hud .score { color: #ffd23d; }
+  .game-hud .lives { letter-spacing: 2px; }
+  .game-frame { position: relative; width: min(86vw, 300px); margin: 0 auto; }
+  #gameCanvas { width: 100%; height: auto; display: block; border-radius: 14px; background: #0a0a23; box-shadow: 0 14px 40px rgba(0,0,0,.5), 0 0 0 3px rgba(120,120,255,.25); }
+  .game-msg { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: rgba(8,6,30,.82); border-radius: 14px; }
+  .game-msg.show { display: flex; }
+  .game-msg .big { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.8rem,9vw,2.6rem); }
+  .game-msg.win .big { color: #6be400; }
+  .game-msg.lose .big { color: #ff5fa2; }
+  .dpad { display: grid; grid-template-columns: repeat(3, 52px); grid-template-rows: repeat(3, 52px); gap: 6px; margin: 16px auto 4px; touch-action: none; }
+  .dpad button { border: none; border-radius: 14px; background: rgba(255,255,255,.14); color: #fff; font-size: 1.4rem; cursor: pointer; transition: transform .1s, background .1s; display: flex; align-items: center; justify-content: center; user-select: none; -webkit-user-select: none; }
+  .dpad button:active { transform: scale(.9); background: rgba(255,255,255,.32); }
+  .dpad .up { grid-area: 1 / 2; }
+  .dpad .left { grid-area: 2 / 1; }
+  .dpad .restart { grid-area: 2 / 2; font-size: 1.2rem; background: rgba(255,210,61,.22); }
+  .dpad .right { grid-area: 2 / 3; }
+  .dpad .down { grid-area: 3 / 2; }
+  .game-tip { font-family: var(--font-body); font-weight: 700; opacity: .82; font-size: .85rem; margin-top: 2px; max-width: 300px; }
+
+  @media (min-width: 700px) {
+    .balloon { width: 80px; height: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- filtro "goo" para el slime -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="goo">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="blur"/>
+      <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9" result="goo"/>
+      <feBlend in="SourceGraphic" in2="goo"/>
+    </filter>
+  </defs>
+</svg>
+
+<div class="app">
+
+  <!-- ============ PÁGINA 1 — INVITACIÓN ============ -->
+  <section class="page page--invite active" data-page="1">
+    <button class="back" aria-label="Atrás">‹</button>
+    <div class="content">
+      <p class="kicker reveal" style="--d:.05s">🎉 ¡Hola, hola! 🎉</p>
+      <div class="spacer"></div>
+      <p class="kicker reveal" style="--d:.15s; opacity:.95">Soy</p>
+      <div class="name-tag reveal" style="--d:.25s">ALBA</div>
+      <div class="age-badge reveal" style="--d:.4s">
+        <span class="num">11</span>
+        <span class="lbl">años</span>
+      </div>
+      <p class="lead reveal" style="--d:.55s"><span class="hero-q">¿Quieres venir a mi cumple? 🥳</span></p>
+      <div class="spacer"></div>
+      <button class="next reveal" style="--d:.7s; background:linear-gradient(135deg,#ffd93d,#ff7eb3); color:#5a1aa8" data-go="2">
+        ¿Quieres saber más? <span class="arrow">→</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ PÁGINA 2 — PISCINA ============ -->
+  <section class="page page--pool" data-page="2">
+    <button class="back" aria-label="Atrás">‹</button>
+    <div class="sun"></div>
+    <div class="donut"></div>
+
+    <!-- guirnalda con bañadores -->
+    <div class="clothesline">
+      <div class="rope"></div>
+      <svg class="swimwear" style="left:16%" viewBox="0 0 60 70">
+        <path d="M8,6 H52 V40 Q52,46 46,46 H36 L30,30 L24,46 H14 Q8,46 8,40 Z" fill="#3dd6ff" stroke="#1aa0c4" stroke-width="2"/>
+        <rect x="8" y="6" width="44" height="6" fill="#1aa0c4"/>
+      </svg>
+      <svg class="swimwear" style="left:44%; animation-delay:.6s" viewBox="0 0 60 70">
+        <path d="M10,14 Q20,8 28,16 Q20,20 16,28 Q10,24 10,14 Z" fill="#ff5fa2"/>
+        <path d="M50,14 Q40,8 32,16 Q40,20 44,28 Q50,24 50,14 Z" fill="#ff5fa2"/>
+        <path d="M16,15 Q30,11 44,15" stroke="#ff5fa2" stroke-width="2" fill="none"/>
+        <path d="M20,42 Q30,40 40,42 Q38,56 30,60 Q22,56 20,42 Z" fill="#ff5fa2"/>
+      </svg>
+      <svg class="swimwear" style="left:72%; animation-delay:.3s; width:clamp(28px,7vw,40px)" viewBox="0 0 50 80">
+        <rect x="10" y="6" width="30" height="68" rx="4" fill="#ffd93d"/>
+        <rect x="10" y="20" width="30" height="8" fill="#ff7eb3"/>
+        <rect x="10" y="36" width="30" height="8" fill="#7be0ff"/>
+        <rect x="10" y="52" width="30" height="8" fill="#ff7eb3"/>
+        <rect x="10" y="6" width="30" height="68" rx="4" fill="none" stroke="rgba(0,0,0,.07)" stroke-width="1.5"/>
+      </svg>
+    </div>
+
+    <!-- sombrilla de playa -->
+    <svg class="pool-item umbrella" viewBox="0 0 100 112">
+      <defs><clipPath id="umb"><path d="M50,6 A44,44 0 0 1 94,50 L6,50 A44,44 0 0 1 50,6 Z"/></clipPath></defs>
+      <rect x="48" y="48" width="4" height="60" rx="2" fill="#a06a35"/>
+      <g clip-path="url(#umb)">
+        <rect x="6" y="0" width="22" height="52" fill="#ff5fa2"/>
+        <rect x="28" y="0" width="22" height="52" fill="#fff"/>
+        <rect x="50" y="0" width="22" height="52" fill="#ffd23d"/>
+        <rect x="72" y="0" width="22" height="52" fill="#fff"/>
+      </g>
+      <path d="M6,50 Q17,44 28,50 Q39,44 50,50 Q61,44 72,50 Q83,44 94,50" fill="none" stroke="rgba(0,0,0,.1)" stroke-width="2"/>
+      <circle cx="50" cy="6" r="3.5" fill="#ff5fa2"/>
+    </svg>
+
+    <!-- pelota de playa -->
+    <svg class="pool-item beachball" viewBox="0 0 100 100">
+      <defs><clipPath id="ball"><circle cx="50" cy="50" r="46"/></clipPath></defs>
+      <g clip-path="url(#ball)">
+        <rect width="100" height="100" fill="#fff"/>
+        <path d="M50,2 C22,28 22,72 50,98 L26,98 C2,72 2,28 26,2 Z" fill="#ff5fa2"/>
+        <path d="M50,2 C78,28 78,72 50,98 L74,98 C98,72 98,28 74,2 Z" fill="#3dd6ff"/>
+        <path d="M50,2 C42,30 42,70 50,98 C58,70 58,30 50,2 Z" fill="#ffd23d"/>
+      </g>
+      <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(0,0,0,.07)" stroke-width="2"/>
+      <ellipse cx="36" cy="32" rx="12" ry="8" fill="#fff" opacity=".55"/>
+    </svg>
+
+    <!-- flotador salvavidas -->
+    <svg class="pool-item lifering" viewBox="0 0 100 100">
+      <defs><mask id="hole"><rect width="100" height="100" fill="#fff"/><circle cx="50" cy="50" r="19" fill="#000"/></mask></defs>
+      <g mask="url(#hole)">
+        <circle cx="50" cy="50" r="44" fill="#fff"/>
+        <path d="M50,6 A44,44 0 0 1 94,50 L69,50 A19,19 0 0 0 50,31 Z" fill="#ff4d4d"/>
+        <path d="M94,50 A44,44 0 0 1 50,94 L50,69 A19,19 0 0 0 69,50 Z" fill="#fff"/>
+        <path d="M50,94 A44,44 0 0 1 6,50 L31,50 A19,19 0 0 0 50,69 Z" fill="#ff4d4d"/>
+        <path d="M6,50 A44,44 0 0 1 50,6 L50,31 A19,19 0 0 0 31,50 Z" fill="#fff"/>
+      </g>
+      <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="1.5"/>
+    </svg>
+
+    <!-- delfín saltando -->
+    <svg class="dolphin" viewBox="0 0 160 120">
+      <path d="M20,58 C9,47 5,55 8,63 C3,66 6,76 16,73 C14,82 25,83 29,74 C33,65 28,60 20,58 Z" fill="#3fb5dd"/>
+      <path d="M26,68 C42,51 78,47 108,53 C123,56 134,53 144,41 C148,53 141,63 129,67 C141,71 147,81 149,93 C136,81 121,77 109,79 C80,85 45,83 31,77 C26,75 24,72 26,68 Z" fill="#54c8ee"/>
+      <path d="M72,50 C76,37 86,35 92,41 C86,45 82,49 80,53 Z" fill="#3fb5dd"/>
+      <path d="M90,67 C94,79 104,83 112,81 C102,75 98,71 96,65 Z" fill="#3fb5dd"/>
+      <path d="M42,73 C62,77 92,77 120,73 C114,81 92,85 66,83 C52,83 44,79 42,73 Z" fill="#d8f5ff" opacity=".85"/>
+      <circle cx="126" cy="53" r="3.2" fill="#0a3344"/>
+      <path d="M134,59 Q140,61 144,58" stroke="#0a3344" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    </svg>
+
+    <!-- pulpo pirata con sombrero -->
+    <svg class="pool-item sea" style="left:5%; top:45%; width:clamp(80px,22vw,120px); z-index:3" viewBox="0 0 120 132">
+      <g class="tentacles" fill="#b14de0">
+        <path d="M30,82 Q18,102 24,124 Q28,110 34,102 Z"/>
+        <path d="M45,90 Q38,114 30,130 Q40,118 48,106 Z"/>
+        <path d="M60,92 Q60,116 60,132 Q66,118 66,104 Z"/>
+        <path d="M75,90 Q82,114 90,130 Q80,118 72,106 Z"/>
+        <path d="M90,82 Q102,102 96,124 Q92,110 86,102 Z"/>
+      </g>
+      <ellipse cx="60" cy="64" rx="40" ry="38" fill="#c45ef0"/>
+      <ellipse cx="60" cy="74" rx="26" ry="19" fill="#e0a0ff" opacity=".5"/>
+      <circle cx="46" cy="60" r="9" fill="#fff"/>
+      <circle cx="47" cy="62" r="4.5" fill="#1a1a2a"/>
+      <path d="M64,54 L84,54 L82,66 L66,66 Z" fill="#1a1a1a"/>
+      <path d="M40,54 Q60,48 84,54" stroke="#1a1a1a" stroke-width="2.5" fill="none"/>
+      <path d="M52,78 Q60,86 68,78" stroke="#7a1fa0" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M28,36 Q60,10 92,36 Q92,42 60,42 Q28,42 28,36 Z" fill="#1a1a1a"/>
+      <circle cx="60" cy="27" r="6" fill="#fff"/>
+      <rect x="56" y="31" width="8" height="4" fill="#fff"/>
+      <circle cx="57.5" cy="26" r="1.4" fill="#1a1a1a"/>
+      <circle cx="62.5" cy="26" r="1.4" fill="#1a1a1a"/>
+    </svg>
+
+    <!-- pulpo pirata con bandana -->
+    <svg class="pool-item sea" style="right:5%; top:55%; width:clamp(74px,20vw,110px); z-index:3; animation-delay:.8s" viewBox="0 0 120 132">
+      <g class="tentacles" fill="#ff6b5e">
+        <path d="M30,82 Q18,102 24,124 Q28,110 34,102 Z"/>
+        <path d="M45,90 Q38,114 30,130 Q40,118 48,106 Z"/>
+        <path d="M60,92 Q60,116 60,132 Q66,118 66,104 Z"/>
+        <path d="M75,90 Q82,114 90,130 Q80,118 72,106 Z"/>
+        <path d="M90,82 Q102,102 96,124 Q92,110 86,102 Z"/>
+      </g>
+      <ellipse cx="60" cy="64" rx="40" ry="38" fill="#ff8a7a"/>
+      <ellipse cx="60" cy="74" rx="26" ry="19" fill="#ffc0b5" opacity=".5"/>
+      <circle cx="46" cy="60" r="9" fill="#fff"/>
+      <circle cx="74" cy="60" r="9" fill="#fff"/>
+      <circle cx="46" cy="62" r="4.5" fill="#1a1a2a"/>
+      <circle cx="74" cy="62" r="4.5" fill="#1a1a2a"/>
+      <path d="M52,78 Q60,84 68,78" stroke="#c0392b" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M24,42 Q60,24 96,42 L96,48 Q60,36 24,48 Z" fill="#e23744"/>
+      <path d="M92,44 L110,38 L106,52 L92,50 Z" fill="#e23744"/>
+      <circle cx="40" cy="42" r="2" fill="#fff"/>
+      <circle cx="56" cy="37" r="2" fill="#fff"/>
+      <circle cx="72" cy="37" r="2" fill="#fff"/>
+      <circle cx="86" cy="42" r="2" fill="#fff"/>
+    </svg>
+
+    <!-- calamar 1 -->
+    <svg class="pool-item sea" style="left:30%; top:22%; width:clamp(46px,12vw,72px); z-index:3; animation-delay:1.2s" viewBox="0 0 90 132">
+      <path d="M45,10 Q22,18 30,34 Q40,26 45,28 Z" fill="#ff7eb3"/>
+      <path d="M45,10 Q68,18 60,34 Q50,26 45,28 Z" fill="#ff7eb3"/>
+      <path d="M30,28 Q45,14 60,28 L58,78 Q45,92 32,78 Z" fill="#ff9ec7"/>
+      <circle cx="40" cy="62" r="7" fill="#fff"/>
+      <circle cx="50" cy="62" r="7" fill="#fff"/>
+      <circle cx="40" cy="63" r="3.5" fill="#1a1a2a"/>
+      <circle cx="50" cy="63" r="3.5" fill="#1a1a2a"/>
+      <g class="tentacles" fill="#ff86bd">
+        <path d="M34,82 Q28,104 30,124 Q36,108 40,92 Z"/>
+        <path d="M42,84 Q40,108 42,128 Q46,110 46,92 Z"/>
+        <path d="M48,84 Q50,108 48,128 Q44,110 44,92 Z"/>
+        <path d="M56,82 Q62,104 60,124 Q54,108 50,92 Z"/>
+      </g>
+      <path d="M40,86 Q30,112 38,130" stroke="#ff86bd" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M50,86 Q60,112 52,130" stroke="#ff86bd" stroke-width="4" fill="none" stroke-linecap="round"/>
+    </svg>
+
+    <!-- calamar 2 -->
+    <svg class="pool-item sea" style="right:28%; top:62%; width:clamp(40px,10vw,62px); z-index:3; animation-delay:.4s" viewBox="0 0 90 132">
+      <path d="M45,10 Q22,18 30,34 Q40,26 45,28 Z" fill="#ffc35e"/>
+      <path d="M45,10 Q68,18 60,34 Q50,26 45,28 Z" fill="#ffc35e"/>
+      <path d="M30,28 Q45,14 60,28 L58,78 Q45,92 32,78 Z" fill="#ffd98a"/>
+      <circle cx="40" cy="62" r="7" fill="#fff"/>
+      <circle cx="50" cy="62" r="7" fill="#fff"/>
+      <circle cx="40" cy="63" r="3.5" fill="#1a1a2a"/>
+      <circle cx="50" cy="63" r="3.5" fill="#1a1a2a"/>
+      <g class="tentacles" fill="#ffce75">
+        <path d="M34,82 Q28,104 30,124 Q36,108 40,92 Z"/>
+        <path d="M42,84 Q40,108 42,128 Q46,110 46,92 Z"/>
+        <path d="M48,84 Q50,108 48,128 Q44,110 44,92 Z"/>
+        <path d="M56,82 Q62,104 60,124 Q54,108 50,92 Z"/>
+      </g>
+      <path d="M40,86 Q30,112 38,130" stroke="#ffce75" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M50,86 Q60,112 52,130" stroke="#ffce75" stroke-width="4" fill="none" stroke-linecap="round"/>
+    </svg>
+
+    <!-- tiburón que se come un pez -->
+    <div class="shark-scene">
+      <svg class="shark" viewBox="0 0 210 110">
+        <path d="M22,55 L4,28 Q14,46 18,55 Q14,64 4,84 Z" fill="#6e8090"/>
+        <path d="M20,55 C45,36 85,32 135,38 C170,42 192,46 206,54 C192,62 170,66 135,72 C85,78 45,74 20,55 Z" fill="#8295a8"/>
+        <path d="M45,63 C85,73 140,69 190,58 C150,73 95,77 55,71 C49,69 45,66 45,63 Z" fill="#d2dde8" opacity=".85"/>
+        <path d="M72,38 L92,12 L106,40 Z" fill="#6e8090"/>
+        <path d="M98,67 L114,90 L126,68 Z" fill="#6e8090"/>
+        <path d="M120,48 q-3,7 0,14" stroke="#6e8090" stroke-width="2.2" fill="none"/>
+        <path d="M128,47 q-3,7 0,15" stroke="#6e8090" stroke-width="2.2" fill="none"/>
+        <path d="M136,47 q-3,7 0,15" stroke="#6e8090" stroke-width="2.2" fill="none"/>
+        <g class="jaw">
+          <path d="M158,60 Q184,59 206,54 Q188,74 162,70 Z" fill="#3a4654"/>
+          <path d="M160,61 l5,6 l5,-6 l5,6 l5,-6 l5,6 l5,-6 l5,6 l5,-5 l5,5" fill="#fff"/>
+        </g>
+        <circle cx="160" cy="50" r="4.2" fill="#10141c"/>
+        <circle cx="161.5" cy="48.5" r="1.3" fill="#fff"/>
+      </svg>
+      <div class="prey">
+        <svg viewBox="0 0 80 50" class="fish flip">
+          <path d="M58,25 L76,12 L70,25 L76,38 Z" fill="#ff7a1a"/>
+          <ellipse cx="38" cy="25" rx="28" ry="16" fill="#ffd23d"/>
+          <path d="M34,10 Q42,3 50,11 Z" fill="#ff7a1a"/>
+          <path d="M34,40 Q42,47 50,39 Z" fill="#ff7a1a" opacity=".85"/>
+          <circle cx="20" cy="22" r="4.5" fill="#fff"/>
+          <circle cx="18" cy="22" r="2.3" fill="#1a1a2a"/>
+          <path d="M24,26 Q40,19 52,26" stroke="rgba(255,255,255,.45)" stroke-width="2" fill="none"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="content">
+      <p class="kicker reveal" style="--d:.05s; color:#fff">Plan nº 1</p>
+      <div class="spacer"></div>
+      <div class="reveal" style="--d:.15s; font-size:clamp(3rem,16vw,5rem)">🏖️🌊</div>
+      <h2 class="reveal" style="--d:.25s">Fiesta de Piscina</h2>
+      <p class="lead reveal" style="--d:.4s">¡Bañador, chanclas y muchas ganas de chapotear! Nos espera el agua, los flotadores y un montón de juegos. 💦🦩</p>
+      <div class="spacer"></div>
+      <button class="next reveal" style="--d:.55s; background:linear-gradient(135deg,#ff6f91,#ff9a3c)" data-go="3">
+        ¿Quieres conocer más? <span class="arrow">→</span>
+      </button>
+    </div>
+    <div class="waves">
+      <svg class="wave1" viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M0,40 C150,90 350,0 600,40 C850,80 1050,10 1200,40 L1200,120 L0,120 Z" fill="#0a86c4"/>
+      </svg>
+    </div>
+    <div class="waves" style="height:20vh">
+      <svg class="wave2" viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M0,50 C200,10 400,90 600,50 C800,10 1000,90 1200,50 L1200,120 L0,120 Z" fill="#067aad"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ============ PÁGINA 3 — SLIME ============ -->
+  <section class="page page--slime" data-page="3">
+    <button class="back" aria-label="Atrás">‹</button>
+    <div class="content">
+      <p class="kicker reveal" style="--d:.05s; color:#aaff2e">Plan nº 2 · Manualidades</p>
+      <div class="spacer"></div>
+      <h2 class="reveal" style="--d:.15s">¡Taller de SLIME!</h2>
+      <div class="reveal" style="--d:.25s">
+        <div class="speech">¿Quieres que cambie de color? 👀</div>
+      </div>
+      <div class="slime-stage reveal" style="--d:.35s" id="slimeStage">
+        <div class="blob b0"></div>
+        <div class="blob b1"></div>
+        <div class="blob b2"></div>
+        <div class="blob b3"></div>
+        <div class="blob b4"></div>
+        <div class="slime-face">
+          <div class="eye l"></div>
+          <div class="eye r"></div>
+        </div>
+      </div>
+      <p class="tap-hint reveal" style="--d:.45s">👆 ¡Pínchame!</p>
+      <p class="lead reveal" style="--d:.55s; margin-top:8px">Cada uno hará su propio slime brillante y pringoso para llevárselo a casa. 🌈✨</p>
+      <div class="spacer"></div>
+      <button class="next reveal" style="--d:.65s; background:linear-gradient(135deg,#aaff2e,#00ffc8); color:#1a0633" data-go="4">
+        ¿Quieres conocer más? <span class="arrow">→</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ PÁGINA 4 — PIZZA ============ -->
+  <section class="page page--pizza" data-page="4">
+    <button class="back" aria-label="Atrás">‹</button>
+    <div class="content">
+      <p class="kicker reveal" style="--d:.05s">Plan nº 3 · A comer</p>
+      <div class="spacer"></div>
+      <h2 class="reveal" style="--d:.12s">¡Pizzas para todos!</h2>
+      <p class="reveal" style="--d:.2s; margin-top:6px"><span class="nam">¡Ñam Ñam! 😋</span></p>
+      <div class="pizza-row reveal" style="--d:.32s">
+        <div class="pizza-wrap" id="pizzaWrap">
+          <div class="pizza" id="pizza">
+            <div class="sauce"></div>
+          </div>
+        </div>
+        <svg class="kid" viewBox="0 0 200 205">
+          <rect x="76" y="150" width="48" height="48" rx="14" fill="#ffcf5b"/>
+          <circle cx="100" cy="100" r="55" fill="#ffd9b3"/>
+          <path d="M48,96 C45,55 75,38 100,38 C125,38 155,55 152,96 C150,79 140,69 130,71 C128,59 110,55 100,55 C90,55 72,59 70,71 C60,69 50,79 48,96 Z" fill="#6b4423"/>
+          <circle cx="71" cy="112" r="9" fill="#ff9a9a" opacity=".55"/>
+          <circle cx="129" cy="112" r="9" fill="#ff9a9a" opacity=".55"/>
+          <path d="M75,94 Q83,85 91,94" stroke="#3a2a1a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+          <path d="M109,94 Q117,85 125,94" stroke="#3a2a1a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+          <ellipse class="kid-mouth" cx="100" cy="122" rx="12" ry="9" fill="#a33"/>
+          <g class="kid-arm">
+            <path d="M150,152 L188,120 L198,160 Z" fill="#f4b94e" stroke="#c8862b" stroke-width="2"/>
+            <path d="M157,147 L184,124 L191,151 Z" fill="#e7472f"/>
+            <circle cx="172" cy="138" r="4" fill="#b8261a"/>
+            <circle cx="180" cy="147" r="3" fill="#b8261a"/>
+          </g>
+        </svg>
+      </div>
+      <p class="lead reveal" style="--d:.45s">Pizza recién hecha y calentita, ¡con tus ingredientes favoritos! 🍕🧀</p>
+      <div class="spacer"></div>
+      <button class="next reveal" style="--d:.6s; background:linear-gradient(135deg,#ffd56b,#ff7a3c); color:#9e1c2f" data-go="5">
+        ¿Algo más? 🎉 <span class="arrow">→</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ PÁGINA 5 — JUEGO ============ -->
+  <section class="page page--game" data-page="6">
+    <button class="back" aria-label="Atrás">‹</button>
+    <div class="content">
+      <p class="kicker reveal" style="--d:.05s; color:#ffd23d">¡Mini-juego!</p>
+      <h2 class="reveal" style="--d:.13s; font-size:clamp(1.7rem,8vw,2.8rem)">Comecocos 🟡</h2>
+      <div class="game-hud reveal" style="--d:.22s">
+        <span class="score">🍬 <span id="gScore">0</span></span>
+        <span class="lives" id="gLives">❤❤❤</span>
+      </div>
+      <div class="game-frame reveal" style="--d:.3s">
+        <canvas id="gameCanvas" width="286" height="330"></canvas>
+        <div class="game-msg" id="gameMsg">
+          <div class="big" id="gameMsgText">¡GANASTE!</div>
+          <button class="next" style="background:linear-gradient(135deg,#ffd93d,#ff7eb3); color:#5a1aa8; animation:none" onclick="window.__restartGame&&window.__restartGame()">🔄 Otra vez</button>
+        </div>
+      </div>
+      <div class="dpad reveal" style="--d:.38s">
+        <button class="up" data-dir="up" aria-label="Arriba">▲</button>
+        <button class="left" data-dir="left" aria-label="Izquierda">◀</button>
+        <button class="restart" aria-label="Reiniciar" onclick="window.__restartGame&&window.__restartGame()">🔄</button>
+        <button class="right" data-dir="right" aria-label="Derecha">▶</button>
+        <button class="down" data-dir="down" aria-label="Abajo">▼</button>
+      </div>
+      <p class="game-tip reveal" style="--d:.46s">Mueve con las flechas 👇 o deslizando el dedo sobre el tablero. ¡Cómete los dulces y esquiva a los fantasmas! 👻</p>
+      <div class="spacer"></div>
+      <button class="next reveal" style="--d:.55s; background:linear-gradient(135deg,#8b5cf6,#36e0ff); color:#0c0822" data-go="1">
+        Volver al inicio <span class="arrow">↺</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ PÁGINA 6 — GRACIAS ============ -->
+  <section class="page page--thanks" data-page="5">
+    <button class="back" aria-label="Atrás">‹</button>
+    <div class="content">
+      <p class="kicker reveal" style="--d:.05s; color:#fff">Y para terminar...</p>
+      <div class="spacer"></div>
+      <div class="thanks-big reveal" style="--d:.15s">¡GRACIAS<br>A TODOS!</div>
+      <p class="lead reveal" style="--d:.35s"><span class="pulse-text">Alba se muere de ganas de celebrarlo contigo.</span><br>¡No faltes! 💖</p>
+      <div class="card reveal" style="--d:.5s">
+        <div class="row"><span class="ic">📅</span><span class="val">El día 19</span></div>
+        <div class="row"><span class="ic">⏰</span><span class="val">A las 17:30</span></div>
+        <div class="row"><span class="ic">📍</span><span class="val">Avenida de Velázquez, 12</span></div>
+      </div>
+      <div class="spacer"></div>
+      <p class="reveal" style="--d:.58s"><span class="hero-q" style="font-size:clamp(1.9rem,10vw,3.2rem)">¿Quieres jugar? 🎮</span></p>
+      <div class="spacer"></div>
+      <button class="next reveal" style="--d:.7s; background:linear-gradient(135deg,#8b5cf6,#36e0ff); color:#fff" data-go="6">
+        ¡Sí, vamos! <span class="arrow">→</span>
+      </button>
+    </div>
+  </section>
+
+</div>
+
+<!-- puntitos de progreso -->
+<nav class="dots" id="dots"></nav>
+
+<script>
+  const pages = Array.from(document.querySelectorAll('.page'));
+  const total = pages.length;
+  let current = 1;
+
+  /* ---- navegación táctil robusta: tap fiable en móvil + clic en escritorio ---- */
+  function bindTap(el, handler){
+    let moved=false, sx=0, sy=0, lastTouch=0;
+    el.addEventListener('touchstart', e=>{ moved=false; const t=e.touches[0]; sx=t.clientX; sy=t.clientY; }, {passive:true});
+    el.addEventListener('touchmove', e=>{ const t=e.touches[0]; if(Math.abs(t.clientX-sx)>12||Math.abs(t.clientY-sy)>12) moved=true; }, {passive:true});
+    el.addEventListener('touchend', e=>{ if(moved) return; e.preventDefault(); lastTouch=Date.now(); handler(e); }, {passive:false});
+    el.addEventListener('click', e=>{ if(Date.now()-lastTouch<600) return; handler(e); });
+  }
+
+  /* ---- puntitos ---- */
+  const dotsWrap = document.getElementById('dots');
+  for (let i = 1; i <= total; i++) {
+    const b = document.createElement('button');
+    b.setAttribute('aria-label', 'Página ' + i);
+    bindTap(b, () => goTo(i));
+    dotsWrap.appendChild(b);
+  }
+  const dots = Array.from(dotsWrap.children);
+
+  function goTo(n) {
+    if (n < 1) n = 1;
+    if (n > total) n = total;
+    current = n;
+    pages.forEach(p => p.classList.toggle('active', +p.dataset.page === n));
+    dots.forEach((d, i) => d.classList.toggle('on', i + 1 === n));
+    if (window.__updateGame) window.__updateGame(n);
+  }
+
+  /* ---- botones siguiente y atrás ---- */
+  document.querySelectorAll('[data-go]').forEach(btn => bindTap(btn, () => goTo(+btn.dataset.go)));
+  document.querySelectorAll('.back').forEach(btn => bindTap(btn, () => goTo(current - 1)));
+
+  /* ---- deslizar (solo horizontal) en zonas libres ---- */
+  let startX = 0, startY = 0;
+  document.addEventListener('touchstart', e => { startX = e.touches[0].clientX; startY = e.touches[0].clientY; }, {passive:true});
+  document.addEventListener('touchend', e => {
+    if (document.body.classList.contains('playing')) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.4) goTo(current + (dx < 0 ? 1 : -1));
+  }, {passive:true});
+
+  /* ====== DECORACIONES GENERADAS ====== */
+  const colors = ['#ffd93d','#ff6f91','#7be0ff','#aaff2e','#ff9a3c','#c77dff','#ffffff'];
+  const rnd = (a,b) => a + Math.random()*(b-a);
+
+  function decorate(page, html) { page.insertAdjacentHTML('afterbegin', html); }
+
+  /* --- globos + estrellas + confeti en P1 --- */
+  const p1 = pages[0];
+  for (let i = 0; i < 9; i++) {
+    const c = colors[i % colors.length];
+    decorate(p1, `<div class="balloon" style="left:${rnd(2,92)}%;background:linear-gradient(160deg,${c},${c}cc);animation-duration:${rnd(9,16)}s;animation-delay:${rnd(0,8)}s"></div>`);
+  }
+  for (let i = 0; i < 16; i++) {
+    decorate(p1, `<div class="twinkle" style="top:${rnd(4,80)}%;left:${rnd(3,95)}%;font-size:${rnd(10,22)}px;animation-delay:${rnd(0,3)}s">✦</div>`);
+  }
+  for (let i = 0; i < 22; i++) {
+    const c = colors[Math.floor(rnd(0,colors.length))];
+    decorate(p1, `<div class="confetti" style="left:${rnd(0,100)}%;background:${c};animation-duration:${rnd(3,6)}s;animation-delay:${rnd(0,5)}s;border-radius:${Math.random()<.5?'2px':'50%'}"></div>`);
+  }
+
+  /* --- burbujas en P2 --- */
+  const p2 = pages[1];
+  for (let i = 0; i < 18; i++) {
+    const s = rnd(8,30);
+    decorate(p2, `<div class="bubble" style="left:${rnd(2,96)}%;width:${s}px;height:${s}px;animation-duration:${rnd(6,12)}s;animation-delay:${rnd(0,8)}s"></div>`);
+  }
+
+  /* --- peces nadando en P2 --- */
+  const fishCols = [['#ffd23d','#ff9a3c'],['#ff6f91','#c1158f'],['#7be0ff','#1f9fd0'],['#aaff2e','#5fb000'],['#c77dff','#7b2ff7'],['#ffae5e','#e8702a']];
+  function fishSVG(c, c2, flip) {
+    return `<svg viewBox="0 0 80 50" class="fish${flip?' flip':''}">
+      <path d="M58,25 L76,12 L70,25 L76,38 Z" fill="${c2}"/>
+      <ellipse cx="38" cy="25" rx="28" ry="16" fill="${c}"/>
+      <path d="M34,10 Q42,3 50,11 Z" fill="${c2}"/>
+      <path d="M34,40 Q42,47 50,39 Z" fill="${c2}" opacity=".85"/>
+      <circle cx="20" cy="22" r="4.5" fill="#fff"/>
+      <circle cx="18" cy="22" r="2.3" fill="#1a1a2a"/>
+      <path d="M24,26 Q40,19 52,26" stroke="rgba(255,255,255,.45)" stroke-width="2" fill="none"/>
+    </svg>`;
+  }
+  for (let i = 0; i < 6; i++) {
+    const [c, c2] = fishCols[i % fishCols.length];
+    const goRight = Math.random() < 0.5;
+    const size = rnd(42, 74);
+    decorate(p2, `<div class="fish-swim" style="top:${rnd(18,78)}%;width:${size}px;animation-name:${goRight?'swimR':'swimL'};animation-duration:${rnd(16,30)}s;animation-delay:-${rnd(0,18)}s">${fishSVG(c, c2, goRight)}</div>`);
+  }
+
+  /* --- toppings + vapor en P4 --- */
+  const pizza = document.getElementById('pizza');
+  const place = (cls) => {
+    const ang = rnd(0, Math.PI*2);
+    const r = rnd(8, 34);
+    const x = 50 + Math.cos(ang)*r;
+    const y = 50 + Math.sin(ang)*r;
+    pizza.insertAdjacentHTML('beforeend', `<div class="topping ${cls}" style="left:${x}%;top:${y}%;transform:translate(-50%,-50%) rotate(${rnd(0,360)}deg)"></div>`);
+  };
+  for (let i=0;i<7;i++) place('pep');
+  for (let i=0;i<6;i++) place('basil');
+  for (let i=0;i<10;i++) place('chz');
+  const pw = document.getElementById('pizzaWrap');
+  for (let i=0;i<4;i++) {
+    pw.insertAdjacentHTML('afterbegin', `<div class="steam" style="left:${rnd(30,70)}%;animation-delay:${rnd(0,3)}s"></div>`);
+  }
+
+  /* --- corazones + confeti en P5 --- */
+  const p5 = pages[4];
+  for (let i = 0; i < 12; i++) {
+    decorate(p5, `<div class="heart" style="left:${rnd(2,94)}%;font-size:${rnd(16,34)}px;animation-duration:${rnd(7,13)}s;animation-delay:${rnd(0,8)}s">${Math.random()<.5?'💖':'💕'}</div>`);
+  }
+  for (let i = 0; i < 18; i++) {
+    const c = colors[Math.floor(rnd(0,colors.length))];
+    decorate(p5, `<div class="confetti" style="left:${rnd(0,100)}%;background:${c};animation-duration:${rnd(3,6)}s;animation-delay:${rnd(0,5)}s;border-radius:${Math.random()<.5?'2px':'50%'}"></div>`);
+  }
+
+  /* ====== SLIME INTERACTIVO ====== */
+  const slimePalettes = ['#2ec5ff','#ff4da6','#ff8c2b','#6be400']; // azul, rosa, naranja, verde
+  let slimeIdx = 3; // empieza en verde
+  const stage = document.getElementById('slimeStage');
+
+  function squishSlime() {
+    slimeIdx = (slimeIdx + 1) % slimePalettes.length;
+    const col = slimePalettes[slimeIdx];
+    stage.style.setProperty('--slime', col);
+
+    /* pequeño rebote */
+    stage.animate(
+      [{ transform:'scale(1)' }, { transform:'scale(.9)' }, { transform:'scale(1.06)' }, { transform:'scale(1)' }],
+      { duration: 450, easing: 'ease-out' }
+    );
+
+    /* gotas que saltan */
+    const rect = stage.getBoundingClientRect();
+    for (let i = 0; i < 7; i++) {
+      const d = document.createElement('div');
+      d.className = 'drop';
+      d.style.background = col;
+      const sz = rnd(10, 22);
+      d.style.width = d.style.height = sz + 'px';
+      d.style.left = (rect.width/2 - sz/2) + 'px';
+      d.style.top = (rect.height/2 - sz/2) + 'px';
+      stage.appendChild(d);
+      const ang = rnd(0, Math.PI*2);
+      const dist = rnd(80, 150);
+      d.animate(
+        [
+          { transform:'translate(0,0) scale(1)', opacity:1 },
+          { transform:`translate(${Math.cos(ang)*dist}px, ${Math.sin(ang)*dist + 40}px) scale(.3)`, opacity:0 }
+        ],
+        { duration: rnd(600,900), easing: 'cubic-bezier(.3,.7,.4,1)' }
+      ).onfinish = () => d.remove();
+    }
+  }
+  bindTap(stage, squishSlime);
+
+  /* ===================== JUEGO COMECOCOS ===================== */
+  (function(){
+    const canvas = document.getElementById('gameCanvas');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('gScore');
+    const livesEl = document.getElementById('gLives');
+    const msgBox = document.getElementById('gameMsg');
+    const msgText = document.getElementById('gameMsgText');
+
+    const MAZE = [
+      "1111111111111","1000000000001","1110001010101","1000000010101",
+      "1001001000101","1010001010101","1000110010101","1010100000001",
+      "1011101110101","1000001000001","1011101010101","1010000010001",
+      "1000001010111","1000000000001","1111111111111"
+    ];
+    const ROWS = MAZE.length, COLS = MAZE[0].length, CELL = 22;
+    const PAC_SPEED = 2, GH_SPEED = 2;
+    const DIRS = { up:[0,-1], down:[0,1], left:[-1,0], right:[1,0] };
+    const OPP = { up:'down', down:'up', left:'right', right:'left' };
+    const PAC_START = {c:1, r:13};
+    const GH_START = [ {c:11,r:1,color:'#ff5fa2'}, {c:1,r:1,color:'#36e0ff'} ];
+
+    const isWall = (c,r)=> c<0||c>=COLS||r<0||r>=ROWS||MAZE[r][c]==='1';
+    const ctr = i => i*CELL + CELL/2;
+    const atCenter = o => ((o.x-CELL/2)%CELL===0)&&((o.y-CELL/2)%CELL===0);
+    const cellOf = o => [ (o.x-CELL/2)/CELL, (o.y-CELL/2)/CELL ];
+
+    let dots, pac, ghosts, score, lives, state, started, animId=null, frame=0;
+
+    function buildDots(){
+      dots = new Set();
+      for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(MAZE[r][c]==='0') dots.add(r+','+c);
+      dots.delete(PAC_START.r+','+PAC_START.c);
+      GH_START.forEach(g=> dots.delete(g.r+','+g.c));
+    }
+    function reset(){
+      buildDots(); score=0; lives=3;
+      pac = { x:ctr(PAC_START.c), y:ctr(PAC_START.r), dir:null, next:null, mouth:0, md:1 };
+      ghosts = GH_START.map(g=>({ x:ctr(g.c), y:ctr(g.r), dir:'up', color:g.color }));
+      state='ready'; started=false; frame=0;
+      msgBox.className='game-msg'; hud();
+    }
+    function softReset(){
+      pac.x=ctr(PAC_START.c); pac.y=ctr(PAC_START.r); pac.dir=null; pac.next=null;
+      ghosts.forEach((g,i)=>{ g.x=ctr(GH_START[i].c); g.y=ctr(GH_START[i].r); g.dir='up'; });
+      state='ready'; started=false;
+    }
+    function hud(){ scoreEl.textContent=score; livesEl.textContent = lives>0 ? '❤'.repeat(lives) : '—'; }
+
+    function setDir(d){
+      if(state==='ready'){ state='play'; started=true; }
+      if(state==='play') pac.next=d;
+    }
+    function chompMouth(){ pac.mouth+=pac.md*0.09; if(pac.mouth>=0.33){pac.mouth=0.33;pac.md=-1;} if(pac.mouth<=0){pac.mouth=0;pac.md=1;} }
+
+    function stepPac(){
+      if(atCenter(pac)){
+        const [c,r]=cellOf(pac), key=r+','+c;
+        if(dots.has(key)){ dots.delete(key); score+=10; hud(); if(dots.size===0){ return win(); } }
+        if(pac.next){ const [dx,dy]=DIRS[pac.next]; if(!isWall(c+dx,r+dy)) pac.dir=pac.next; }
+        if(pac.dir){ const [dx,dy]=DIRS[pac.dir]; if(isWall(c+dx,r+dy)) pac.dir=null; }
+      }
+      if(pac.dir){ const [dx,dy]=DIRS[pac.dir]; pac.x+=dx*PAC_SPEED; pac.y+=dy*PAC_SPEED; }
+      chompMouth();
+    }
+    function stepGhost(g){
+      if(atCenter(g)){
+        const [c,r]=cellOf(g);
+        let opts = Object.keys(DIRS).filter(d=>{const [dx,dy]=DIRS[d]; return !isWall(c+dx,r+dy);});
+        const noRev = opts.filter(d=> d!==OPP[g.dir]);
+        if(noRev.length) opts=noRev;
+        const pc=(pac.x-CELL/2)/CELL, pr=(pac.y-CELL/2)/CELL;
+        if(Math.random()<0.62){
+          opts.sort((a,b)=>{ const A=DIRS[a],B=DIRS[b];
+            return Math.hypot(c+A[0]-pc,r+A[1]-pr)-Math.hypot(c+B[0]-pc,r+B[1]-pr); });
+          g.dir=opts[0];
+        } else g.dir=opts[Math.floor(Math.random()*opts.length)];
+      }
+      const [dx,dy]=DIRS[g.dir]; g.x+=dx*GH_SPEED; g.y+=dy*GH_SPEED;
+    }
+    function collide(){
+      for(const g of ghosts){
+        if(Math.hypot(g.x-pac.x,g.y-pac.y) < CELL*0.62){
+          lives--; hud();
+          if(lives<=0) lose(); else softReset();
+          return;
+        }
+      }
+    }
+    function win(){ state='win'; msgText.textContent='¡GANASTE! 🎉'; msgBox.className='game-msg win show'; }
+    function lose(){ state='lose'; msgText.textContent='¡Te pillaron! 👻'; msgBox.className='game-msg lose show'; }
+
+    function update(){
+      frame++;
+      if(state==='play' && started){
+        stepPac();
+        if(state==='play' && (frame%3!==0)) ghosts.forEach(stepGhost);
+        if(state==='play') collide();
+      } else chompMouth();
+    }
+
+    function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+    function drawPac(){
+      const a=pac.mouth*Math.PI;
+      let rot=0;
+      if(pac.dir==='down')rot=Math.PI/2; else if(pac.dir==='left')rot=Math.PI; else if(pac.dir==='up')rot=-Math.PI/2;
+      ctx.save(); ctx.translate(pac.x,pac.y); ctx.rotate(rot);
+      const grd=ctx.createRadialGradient(-2,-2,2,0,0,CELL/2);
+      grd.addColorStop(0,'#fff27a'); grd.addColorStop(1,'#ffd400');
+      ctx.fillStyle=grd; ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,CELL/2-1,a,Math.PI*2-a); ctx.closePath(); ctx.fill();
+      ctx.restore();
+    }
+    function drawGhost(g){
+      const x=g.x,y=g.y,R=CELL/2-1, dv=DIRS[g.dir]||[0,0];
+      ctx.fillStyle=g.color; ctx.beginPath();
+      ctx.arc(x,y-2,R,Math.PI,0); ctx.lineTo(x+R,y+R-1);
+      ctx.lineTo(x+R*0.5,y+R-5); ctx.lineTo(x,y+R-1); ctx.lineTo(x-R*0.5,y+R-5); ctx.lineTo(x-R,y+R-1);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle='#fff';
+      ctx.beginPath(); ctx.arc(x-R*0.4,y-2,3.1,0,7); ctx.fill();
+      ctx.beginPath(); ctx.arc(x+R*0.4,y-2,3.1,0,7); ctx.fill();
+      ctx.fillStyle='#16235e';
+      ctx.beginPath(); ctx.arc(x-R*0.4+dv[0]*1.4,y-2+dv[1]*1.4,1.5,0,7); ctx.fill();
+      ctx.beginPath(); ctx.arc(x+R*0.4+dv[0]*1.4,y-2+dv[1]*1.4,1.5,0,7); ctx.fill();
+    }
+    function draw(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(MAZE[r][c]==='1'){
+        ctx.fillStyle='#2746d6'; rr(c*CELL+2,r*CELL+2,CELL-4,CELL-4,5); ctx.fill();
+        ctx.fillStyle='rgba(130,160,255,.4)'; rr(c*CELL+3,r*CELL+3,CELL-6,3.5,2); ctx.fill();
+      }
+      ctx.fillStyle='#ffd23d';
+      dots.forEach(k=>{ const [r,c]=k.split(',').map(Number); ctx.beginPath(); ctx.arc(ctr(c),ctr(r),2.8,0,7); ctx.fill(); });
+      drawPac(); ghosts.forEach(drawGhost);
+      if(state==='ready'){
+        ctx.fillStyle='#ffd23d'; ctx.textAlign='center';
+        ctx.font='700 20px Fredoka, sans-serif'; ctx.fillText('¡LISTOS!', canvas.width/2, canvas.height/2-4);
+        ctx.fillStyle='#fff'; ctx.font='700 12px Nunito, sans-serif'; ctx.fillText('pulsa una flecha', canvas.width/2, canvas.height/2+15);
+      }
+    }
+    function loop(){ update(); draw(); animId=requestAnimationFrame(loop); }
+
+    document.querySelectorAll('.dpad button[data-dir]').forEach(b=>{
+      const d=b.dataset.dir;
+      const press=e=>{ e.preventDefault(); setDir(d); };
+      b.addEventListener('touchstart',press,{passive:false});
+      b.addEventListener('mousedown',press);
+    });
+    document.addEventListener('keydown',e=>{
+      if(!document.body.classList.contains('playing')) return;
+      const m={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',W:'up',S:'down',A:'left',D:'right'};
+      const d=m[e.key]; if(d){ e.preventDefault(); setDir(d); }
+    });
+
+    /* deslizar el dedo sobre el tablero también mueve */
+    let gsx=0, gsy=0;
+    canvas.addEventListener('touchstart', e=>{ const t=e.touches[0]; gsx=t.clientX; gsy=t.clientY; }, {passive:true});
+    canvas.addEventListener('touchend', e=>{
+      const t=e.changedTouches[0];
+      const dx=t.clientX-gsx, dy=t.clientY-gsy;
+      if(Math.abs(dx)<14 && Math.abs(dy)<14) return;
+      if(Math.abs(dx)>Math.abs(dy)) setDir(dx>0?'right':'left');
+      else setDir(dy>0?'down':'up');
+    }, {passive:true});
+
+    window.__restartGame = reset;
+    window.__updateGame = n=>{
+      const on=(n===6);
+      document.body.classList.toggle('playing', on);
+      if(on){ if(!animId) loop(); } else if(animId){ cancelAnimationFrame(animId); animId=null; }
+    };
+    reset();
+  })();
+
+  /* arrancar */
+  goTo(1);
+</script>
+</body>
+</html>
